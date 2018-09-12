@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.4.1)
+
+include_directories(D:/usr/include)
+
+add_library(native-lib SHARED
+src/main/cpp/native-lib.cpp
+src/main/cpp/Renderer.cpp)
+
+target_link_libraries(native-lib GLESv2)
