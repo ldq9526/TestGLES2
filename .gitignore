@@ -1,0 +1,9 @@
+/*
+/app/*
+/app/src/*
+!/.gitignore
+!/app
+!/app/src
+!/app/build.gradle
+!/app/CMakeLists.txt
+!/app/src/main
