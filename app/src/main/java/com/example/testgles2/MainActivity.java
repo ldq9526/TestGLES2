@@ -13,6 +13,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     private GLSurfaceView glSurfaceView;
     private float oldX, oldY;
+    private double oldDistance;
+    private int hits = 0;
+
+    private double distance(MotionEvent event) {
+        float dx = event.getX(0) - event.getX(1);
+        float dy = event.getY(0) - event.getY(1);
+        return Math.sqrt(dx*dx + dy*dy);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,23 +62,40 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
-        int action = event.getAction();
+        int action = event.getAction() & MotionEvent.ACTION_MASK;
         if(MotionEvent.ACTION_DOWN == action) {
+            hits = 1;
             oldX = event.getX();
             oldY = event.getY();
+        } else if(MotionEvent.ACTION_UP == action) {
+            hits = 0;
+        } else if(MotionEvent.ACTION_POINTER_DOWN == action) {
+            hits += 1;
+            oldDistance = distance(event);
         } else if(MotionEvent.ACTION_MOVE == action) {
-            float dx = event.getX() - oldX, dy = event.getY() - oldY;
-            float adx = Math.abs(dx), ady = Math.abs(dy);
-            if(adx > ady)
-                GLUtils.update(dx/adx, GLUtils.ROTY);
-            else
-                GLUtils.update(dy/ady, GLUtils.ROTX);
-            glSurfaceView.requestRender();
-            oldX += dx;
-            oldY += dy;
-        } else if(MotionEvent.ACTION_UP != action) {
-            GLUtils.reset();
-            glSurfaceView.requestRender();
+            if(hits >= 2) {
+                double newDistance = distance(event);
+                if(Math.abs(newDistance - oldDistance) > 5) {
+                    if(newDistance > oldDistance)
+                        GLUtils.update(0, GLUtils.ROTNULL, .1f);
+                    else
+                        GLUtils.update(0, GLUtils.ROTNULL, -.1f);
+                    glSurfaceView.requestRender();
+                    oldDistance = newDistance;
+                }
+            } else {
+                float dx = event.getX() - oldX, dy = event.getY() - oldY;
+                float adx = Math.abs(dx), ady = Math.abs(dy);
+                if(adx > ady)
+                    GLUtils.update(dx/adx, GLUtils.ROTY, 0);
+                else
+                    GLUtils.update(dy/ady, GLUtils.ROTX, 0);
+                glSurfaceView.requestRender();
+                oldX += dx;
+                oldY += dy;
+            }
+        } else if(MotionEvent.ACTION_POINTER_UP == action) {
+            hits -= 1;
         }
         return true;
     }

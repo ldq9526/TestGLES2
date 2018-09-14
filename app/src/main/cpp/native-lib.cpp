@@ -4,41 +4,112 @@
 static Renderer renderer;
 
 static GLfloat vertices[] = {
+        -1.f, 1.f, 1.f,/* 3 */
+        -1.f, -1.f, 1.f,/* 7 */
+        1.f, -1.f, 1.f,/* 4 */
+        1.f, -1.f, 1.f,/* 4 */
+        1.f, 1.f, 1.f,/* 0 */
+        -1.f, 1.f, 1.f,/* 3 */
+
+        -1.f, 1.f, -1.f,/* 2 */
+        -1.f, 1.f, 1.f,/* 3 */
+        1.f, 1.f, 1.f,/* 0 */
         1.f, 1.f, 1.f,/* 0 */
         1.f, 1.f, -1.f,/* 1 */
         -1.f, 1.f, -1.f,/* 2 */
-        -1.f, 1.f, 1.f,/* 3 */
-        1.f, -1.f, 1.f,/* 4 */
+
+        1.f, 1.f, -1.f,/* 1 */
         1.f, -1.f, -1.f,/* 5 */
         -1.f, -1.f, -1.f,/* 6 */
-        -1.f, -1.f, 1.f/* 7 */
+        -1.f, -1.f, -1.f,/* 6 */
+        -1.f, 1.f, -1.f,/* 2 */
+        1.f, 1.f, -1.f,/* 1 */
+
+        -1.f, -1.f, 1.f,/* 7 */
+        -1.f, -1.f, -1.f,/* 6 */
+        1.f, -1.f, -1.f,/* 5 */
+        1.f, -1.f, -1.f,/* 5 */
+        1.f, -1.f, 1.f,/* 4 */
+        -1.f, -1.f, 1.f,/* 7 */
+
+        1.f, 1.f, 1.f,/* 0 */
+        1.f, -1.f, 1.f,/* 4 */
+        1.f, -1.f, -1.f,/* 5 */
+        1.f, -1.f, -1.f,/* 5 */
+        1.f, 1.f, -1.f,/* 1 */
+        1.f, 1.f, 1.f,/* 0 */
+
+        -1.f, 1.f, -1.f,/* 2 */
+        -1.f, -1.f, -1.f,/* 6 */
+        -1.f, -1.f, 1.f,/* 7 */
+        - 1.f, -1.f, 1.f,/* 7 */
+        - 1.f, 1.f, 1.f,/* 3 */
+        -1.f, 1.f, -1.f/* 2 */
 };
 
-static GLfloat colors[] = {
-        1.f, 0.f, 0.f, 1.f,
-        0.f, 1.f, 0.f, 1.f,
-        0.f, 0.f, 1.f, 1.f,
-        1.f, 1.f, 0.f, 1.f,
-        1.f, 0.f, 1.f, 1.f,
-        0.f, 1.f, 1.f, 1.f,
-        1.f, .5f, 0.f, 1.f,
-        .5f, .5f, .5f, 1.f
+static GLfloat texCoord[] = {
+        0.f, 0.f,
+        0.f, 1.f,
+        1.f, 1.f,
+        1.f, 1.f,
+        1.f, 0.f,
+        0.f, 0.f,
+
+        0.f, 0.f,
+        0.f, 1.f,
+        1.f, 1.f,
+        1.f, 1.f,
+        1.f, 0.f,
+        0.f, 0.f,
+
+        0.f, 0.f,
+        0.f, 1.f,
+        1.f, 1.f,
+        1.f, 1.f,
+        1.f, 0.f,
+        0.f, 0.f,
+
+        0.f, 0.f,
+        0.f, 1.f,
+        1.f, 1.f,
+        1.f, 1.f,
+        1.f, 0.f,
+        0.f, 0.f,
+
+        0.f, 0.f,
+        0.f, 1.f,
+        1.f, 1.f,
+        1.f, 1.f,
+        1.f, 0.f,
+        0.f, 0.f,
+
+        0.f, 0.f,
+        0.f, 1.f,
+        1.f, 1.f,
+        1.f, 1.f,
+        1.f, 0.f,
+        0.f, 0.f
 };
 
-static GLubyte indices[] = {
-        0,1,2, 0,2,3,
-        0,3,7, 0,7,4,
-        0,4,5, 0,5,1,
-        7,6,5, 7,5,4,
-        1,5,6, 1,6,2,
-        2,6,7, 2,7,3
-};
+extern unsigned char data0[];
+extern unsigned char data1[];
+extern unsigned char data2[];
+extern unsigned char data3[];
+extern unsigned char data4[];
+extern unsigned char data5[];
 
 JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_initialize
         (JNIEnv *, jclass) {
-    renderer.setVertices(vertices);
-    renderer.setColors(colors);
-    renderer.setIndices(indices, 36);
+    renderer.setVertices(vertices, 36);
+    renderer.setTextureN(6);
+    renderer.setTextureSize(200, 200);
+    renderer.setTexCoord(texCoord);
+    renderer.addTextureData(data0);
+    renderer.addTextureData(data1);
+    renderer.addTextureData(data2);
+    renderer.addTextureData(data3);
+    renderer.addTextureData(data4);
+    renderer.addTextureData(data5);
     renderer.initialize();
 }
 
@@ -53,8 +124,8 @@ JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_display
 }
 
 JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_update
-        (JNIEnv *, jclass, jfloat angle, jint rotationAxis) {
-    renderer.update(angle, rotationAxis);
+        (JNIEnv *, jclass, jfloat angle, jint rotationAxis, jfloat translation) {
+    renderer.update(angle, rotationAxis, translation);
 }
 
 JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_reset

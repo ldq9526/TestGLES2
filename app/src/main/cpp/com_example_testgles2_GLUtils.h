@@ -34,10 +34,10 @@ JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_display
 /*
  * Class:     com_example_testgles2_GLUtils
  * Method:    update
- * Signature: (FI)V
+ * Signature: (FIF)V
  */
 JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_update
-  (JNIEnv *, jclass, jfloat, jint);
+  (JNIEnv *, jclass, jfloat, jint, jfloat);
 
 /*
  * Class:     com_example_testgles2_GLUtils
