@@ -19,6 +19,7 @@ Renderer::~Renderer() {
     glBindTexture(GL_TEXTURE_2D, 0);
     glDeleteTextures(_textureN, _textures);
     delete [] _textures;
+    _textures = nullptr;
 }
 
 void Renderer::setVertices(const GLfloat * const &vertices, GLsizei vertexN) {
@@ -100,6 +101,8 @@ void Renderer::initialize() {
     glVertexAttribPointer(textureLocation, 2, GL_FLOAT, GL_FALSE, 0, _texCoord);
     glEnableVertexAttribArray(textureLocation);
 
+    if(_textures != nullptr)
+        delete [] _textures;
     _textures = new GLuint [_textureN];
     glGenTextures(_textureN, _textures);
     for(int i = 0; i < _textureN; i++) {

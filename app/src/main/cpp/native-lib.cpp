@@ -102,7 +102,7 @@ JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_initialize
         (JNIEnv *, jclass) {
     renderer.setVertices(vertices, 36);
     renderer.setTextureN(6);
-    renderer.setTextureSize(200, 200);
+    renderer.setTextureSize(128, 128);
     renderer.setTexCoord(texCoord);
     renderer.addTextureData(data0);
     renderer.addTextureData(data1);
