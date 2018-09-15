@@ -9,6 +9,22 @@ extern "C" {
 #endif
 /*
  * Class:     com_example_testgles2_GLUtils
+ * Method:    setTextureNumber
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_setTextureNumber
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     com_example_testgles2_GLUtils
+ * Method:    addTexture
+ * Signature: (ILandroid/graphics/Bitmap;II)V
+ */
+JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_addTexture
+  (JNIEnv *, jclass, jint, jobject, jint, jint);
+
+/*
+ * Class:     com_example_testgles2_GLUtils
  * Method:    initialize
  * Signature: ()V
  */

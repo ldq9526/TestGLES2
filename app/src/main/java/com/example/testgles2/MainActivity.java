@@ -1,10 +1,15 @@
 package com.example.testgles2;
 
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.io.InputStream;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -31,6 +36,17 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
             @Override
             public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
+                AssetManager assetManager = getAssets();
+                String [] textureFileNames = {"asuna.png", "chtholly.jpg", "hinata.png", "kirino.jpg", "mikoto.jpg", "sagiri.jpg"};
+                GLUtils.setTextureNumber(textureFileNames.length);
+                try {
+                    for(int i = 0; i < textureFileNames.length; i++) {
+                        InputStream inputStream = assetManager.open(textureFileNames[i]);
+                        Bitmap texture = BitmapFactory.decodeStream(inputStream);
+                        GLUtils.addTexture(i, texture, texture.getWidth(), texture.getHeight());
+                        inputStream.close();
+                    }
+                } catch (Exception ignored) {}
                 GLUtils.initialize();
             }
 
@@ -96,6 +112,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         } else if(MotionEvent.ACTION_POINTER_UP == action) {
             hits -= 1;
+        } else {
+            GLUtils.reset();
+            glSurfaceView.requestRender();
         }
         return true;
     }

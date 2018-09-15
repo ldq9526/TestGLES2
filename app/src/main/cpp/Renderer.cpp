@@ -9,13 +9,11 @@ Renderer::Renderer() {
     _translationZ = -5.f;
     _width = _height = 0;
     _programId = 0;
-    _vertices = _colors = _texCoord = nullptr;
-    _indices = nullptr;
-    _count = _vertexN = 0;
+    _vertices = _texCoord = nullptr;
+    _vertexN = _textureN = 0;
 }
 
 Renderer::~Renderer() {
-    _textureData.clear();
     glBindTexture(GL_TEXTURE_2D, 0);
     glDeleteTextures(_textureN, _textures);
     delete [] _textures;
@@ -31,26 +29,25 @@ void Renderer::setTexCoord(const GLfloat *const &texCoord) {
     _texCoord = (GLfloat *)texCoord;
 }
 
-void Renderer::setColors(const GLfloat * const &colors) {
-    _colors = (GLfloat *) colors;
-}
-
-void Renderer::setIndices(const GLubyte * const &indices, GLsizei count) {
-    _indices = (GLubyte *) indices;
-    _count = count;
-}
-
 void Renderer::setTextureN(GLsizei textureN) {
     _textureN = textureN;
+    if(_textures != nullptr)
+        delete [] _textures;
+    _textures = new GLuint [_textureN];
+    glGenTextures(_textureN, _textures);
 }
 
-void Renderer::setTextureSize(int width, int height) {
-    _textureWidth = width;
-    _textureHeight = height;
-}
+void Renderer::addTextureData(int index, unsigned char * data, int width, int height) {
+    glBindTexture(GL_TEXTURE_2D, _textures[index]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-void Renderer::addTextureData(unsigned char * data) {
-    _textureData.push_back(data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Renderer::initialize() {
@@ -77,7 +74,7 @@ void Renderer::initialize() {
                     "varying vec2 vertexTex;"
                     "uniform sampler2D sampler;"
                     "void main() {"
-                    "gl_FragColor = texture2D(sampler,vertexTex);"
+                    "gl_FragColor=texture2D(sampler,vertexTex);"
                     "}";
     GLuint fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShaderId, 1, &fragmentShaderSource, NULL);
@@ -100,23 +97,6 @@ void Renderer::initialize() {
     GLuint textureLocation = (GLuint)glGetAttribLocation(_programId, "texCoord");
     glVertexAttribPointer(textureLocation, 2, GL_FLOAT, GL_FALSE, 0, _texCoord);
     glEnableVertexAttribArray(textureLocation);
-
-    if(_textures != nullptr)
-        delete [] _textures;
-    _textures = new GLuint [_textureN];
-    glGenTextures(_textureN, _textures);
-    for(int i = 0; i < _textureN; i++) {
-        glBindTexture(GL_TEXTURE_2D, _textures[i]);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        // set texture filtering parameters
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _textureWidth, _textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, _textureData[i]);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Renderer::reshape(GLsizei width, GLsizei height) {
@@ -124,8 +104,6 @@ void Renderer::reshape(GLsizei width, GLsizei height) {
 }
 
 void Renderer::display() {
-    if(_vertices == nullptr)
-        return ;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glm::mat4 view = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, _translationZ));
     glm::mat4 model = glm::rotate(glm::mat4(1.f), glm::radians(GLfloat(_angleX)), glm::vec3(0.f, 1.f, 0.f));
@@ -146,7 +124,7 @@ void Renderer::update(GLfloat angle, int rotationAxis, GLfloat translation) {
         _angleY += GLint(angle);
     else if(rotationAxis == 1)
         _angleX += GLint(angle);
-    else if(_translationZ + translation < -1.5f)
+    else if(_translationZ + translation < -1.732f)
         _translationZ += translation;
 }
 

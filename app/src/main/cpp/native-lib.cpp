@@ -1,5 +1,7 @@
 #include "com_example_testgles2_GLUtils.h"
 #include "Renderer.h"
+#include <android/bitmap.h>
+#include <opencv2/opencv.hpp>
 
 static Renderer renderer;
 
@@ -91,25 +93,25 @@ static GLfloat texCoord[] = {
         0.f, 0.f
 };
 
-extern unsigned char data0[];
-extern unsigned char data1[];
-extern unsigned char data2[];
-extern unsigned char data3[];
-extern unsigned char data4[];
-extern unsigned char data5[];
+JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_setTextureNumber
+        (JNIEnv *, jclass, jint n) {
+    renderer.setTextureN(n);
+}
+
+JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_addTexture
+        (JNIEnv * env, jclass, jint index, jobject texture, jint width, jint height) {
+    void *pixels;
+    AndroidBitmap_lockPixels(env, texture, &pixels);
+    cv::Mat image(height, width, CV_8UC4, pixels);
+    cv::cvtColor(image, image, cv::COLOR_BGRA2BGR);
+    renderer.addTextureData(index, image.data, width, height);
+    AndroidBitmap_unlockPixels(env, texture);
+}
 
 JNIEXPORT void JNICALL Java_com_example_testgles2_GLUtils_initialize
         (JNIEnv *, jclass) {
     renderer.setVertices(vertices, 36);
-    renderer.setTextureN(6);
-    renderer.setTextureSize(128, 128);
     renderer.setTexCoord(texCoord);
-    renderer.addTextureData(data0);
-    renderer.addTextureData(data1);
-    renderer.addTextureData(data2);
-    renderer.addTextureData(data3);
-    renderer.addTextureData(data4);
-    renderer.addTextureData(data5);
     renderer.initialize();
 }
 
